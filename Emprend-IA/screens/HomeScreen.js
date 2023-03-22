@@ -32,13 +32,9 @@ export default function HomeScreen({ navigation }) {
       />
 
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Registrarse</Text>
+        <Text style={styles.buttonText}>Empezar</Text>
       </TouchableOpacity>
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.paragraph}>¿Ya tienes una cuenta? </Text>
-        </TouchableOpacity>
-      </View>
+      <View style={styles.footer}></View>
     </View>
   );
 }
