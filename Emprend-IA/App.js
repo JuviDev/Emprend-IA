@@ -10,6 +10,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 
+/** URL polyfill */
+import "react-native-url-polyfill/auto";
+
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import HomeScreen from "./screens/HomeScreen";

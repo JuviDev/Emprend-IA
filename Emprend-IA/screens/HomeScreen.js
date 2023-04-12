@@ -1,106 +1,173 @@
-import React, { useState } from "react";
 import {
-  View,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
+  View,
+  Image,
+  ActivityIndicator,
 } from "react-native";
+import React from "react";
+import { Configuration, OpenAIApi } from "openai";
+import Carousel from "react-native-snap-carousel";
 
-export default function HomeScreen({ navigation }) {
-  const [companyName, setCompanyName] = useState("");
-  const [description, setDescription] = useState("");
+export default function HomeScreen() {
+  const [prompt, onChangePrompt] = React.useState(
+    "Cthulu, intricate sand sculpture, high detail,UHD"
+  );
+  const [result, setResult] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [imagePlaceholder, setimagePlaceholder] = React.useState(
+    "https://furntech.org.za/wp-content/uploads/2017/05/placeholder-image-300x225.png"
+  );
 
-  const handleHome = () => {
-    // Lógica de registro aquí
+  const configuration = new Configuration({
+    apiKey: "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",
+  });
+
+  const openai = new OpenAIApi(configuration);
+
+  const generateImage = async () => {
+    try {
+      onChangePrompt(`Search ${prompt}..`);
+      setLoading(true);
+      const res = await openai.createImage({
+        prompt: prompt,
+        n: 4,
+        size: "256x256",
+      });
+
+      setResult(
+        res.data.data.map((item) => {
+          return {
+            url: item.url,
+          };
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Nombre de la compañia</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setCompanyName(text)}
-        value={companyName}
-        placeholder="Emprend.IA"
-      />
-      <Text style={styles.label}>Descripción</Text>
-      <TextInput
-        style={styles.TextArea}
-        onChangeText={(text) => setDescription(text)}
-        value={description}
-      />
+  const renderItems = ({ item, index }) => (
+    <Image
+      style={styles.generatedImage}
+      source={{
+        uri: item.url,
+      }}
+      key={index}
+    />
+  );
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Empezar</Text>
-      </TouchableOpacity>
-      <View style={styles.footer}></View>
-    </View>
+  return (
+    <SafeAreaView>
+      <View style={styles.container}>
+        <Text style={styles.titleText}>React Native Dalle-E</Text>
+        <View style={styles.TextInputcontainer}>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={onChangePrompt}
+            value={prompt}
+            editable
+            multiline
+            numberOfLines={4}
+          />
+        </View>
+        <TouchableOpacity style={styles.generateButton} onPress={generateImage}>
+          <Text style={styles.generateButtonText}>Generate</Text>
+        </TouchableOpacity>
+        {loading ? (
+          <>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+              <Text>Generating...</Text>
+            </View>
+          </>
+        ) : (
+          <></>
+        )}
+
+        <View style={styles.generatedImageContainer}>
+          {result.length > 0 ? (
+            <Carousel
+              layout={"stack"}
+              layoutCardOffset={18}
+              data={result}
+              renderItem={renderItems}
+              sliderWidth={300}
+              itemWidth={300}
+            />
+          ) : (
+            <>
+              <Image
+                style={styles.generatedImage}
+                source={{
+                  uri: imagePlaceholder,
+                }}
+              />
+            </>
+          )}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 30,
-    backgroundColor: "#020202",
-    alignContent: "center",
+    paddingHorizontal: 10,
   },
-  title: {
-    fontSize: 24,
+  containerImages: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gridGap: 10,
+  },
+  loadingContainer: {
+    paddingHorizontal: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleText: {
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
+    textAlign: "center",
   },
-  paragraph: {
-    fontSize: 16,
-    marginBottom: 20,
+
+  TextInputcontainer: {
+    height: 100,
+    backgroundColor: "#c7c7c7",
+    borderWidth: 2,
+    borderColor: "black",
+    borderRadius: 10,
+    marginVertical: 10,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  input: {
+  textInput: {
     width: "100%",
+    height: "100%",
+    padding: 10,
+  },
+  generateButton: {
     height: 50,
-    borderWidth: 2,
-    borderColor: "#52b788",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  TextArea: {
     width: "100%",
-    height: 200,
-    borderWidth: 2,
-    borderColor: "#52b788",
+    backgroundColor: "black",
     borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  button: {
-    marginTop: 20,
-    backgroundColor: "#021b0e",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: "center",
+    marginVertical: 10,
     justifyContent: "center",
+    alignItems: "center",
   },
-  buttonText: {
+  generateButtonText: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
   },
-  img: {
-    width: "100%",
-    height: 230,
-    borderRadius: 5,
-  },
-  footer: {
-    flexDirection: "row",
+  generatedImageContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 10,
+  },
+  generatedImage: {
+    width: 280,
+    height: 280,
   },
 });
