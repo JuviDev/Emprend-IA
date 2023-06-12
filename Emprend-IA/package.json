@@ -1,6 +1,7 @@
 {
   "name": "emprend-ia",
   "version": "1.0.0",
+    "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -25,7 +26,10 @@
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "expo-sharing": "~11.2.2",
-    "expo-splash-screen": "~0.18.2"
+    "expo-splash-screen": "~0.18.2",
+    "react-native-web": "~0.18.10",
+    "react-dom": "18.2.0",
+    "@expo/webpack-config": "^18.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
